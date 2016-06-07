@@ -22,11 +22,14 @@ public class Main {
         Spark.get(
                 "/",
                 (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
                     HashMap m = new HashMap();
-                    if (user==null){
+                    if (username==null){
                         return new ModelAndView(m, "index.html");
                     }
                     else {
+                        User user = users.get(username);
                         m.put("messages", User.messages);
                         return new ModelAndView(m, "messages.html");
                     }
@@ -37,18 +40,25 @@ public class Main {
         Spark.post(
                 "/create-user",
                 (request, response) ->{
-                    String name = request.queryParams("name");
+                    String name = request.queryParams("username");
                     String password = request.queryParams("pass");
-                    if (password.equals(PASSWORD)){
-                        user = new User(name,password);
-                        users.put(name, user);
-                        response.redirect("/");
+                    if (name == null || password == null){
+                        throw new Exception("Name or pass not sent.");
                     }
-                    else{
-                        throw new Exception("Wrong Password");
+
+                    User user = users.get(name);
+                    if (!password.equals(PASSWORD)){
+                        throw new Exception("wrong password");
                     }
+                    else if (user == null){
+                        user = new User(name, password);
+                      users.put(name, user);
+                    }
+
                     Session session = request.session();
                     session.attribute("username", name);
+
+                    response.redirect("/");
                     return "";
                 }
         );
@@ -93,6 +103,29 @@ public class Main {
                         throw new Exception("invalid id");
                     }
                     user.messages.remove(id-1);
+                    response.redirect("/");
+                    return "";
+                }
+        );
+        Spark.post(
+                "/edit-message",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    if (username == null){
+                        throw new Exception("Not Logged In");
+                    }
+
+                    int idEdit = Integer.valueOf(request.queryParams("idEdit"));
+                    String edits = request.queryParams("edits");
+
+
+                    User user = users.get(username);
+                    if (idEdit <= 0 || idEdit -1 >= user.messages.size()){
+                        throw new Exception("invalid id");
+                    }
+                    Message message = new Message(edits);
+                    user.messages.set(idEdit-1, message);
                     response.redirect("/");
                     return "";
                 }

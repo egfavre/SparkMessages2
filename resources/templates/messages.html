@@ -9,11 +9,22 @@
     <input type="text" placeholder="Message" name="message">
     <button type="submit">Submit</button>
 </form>
+<form action="/delete-message" method="post">
+    <input type="number" name="id" placeholder="#"/>
+    <button type="submit">Delete message</button>
+</form>
+<form action="/edit-message" method="post">
+    <input type="number" name="idEdit" placeholder="#"/>
+    <input type="text" name="edits" placeholder="Type new message here">
+    <button type="submit">Edit message</button>
+</form>
 <ol>
     {{#messages}}
     <li>{{text}}</li>
     {{/messages}}
 </ol>
-
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
 </body>
 </html>
