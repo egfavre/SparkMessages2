@@ -9,5 +9,11 @@
     <input type="text" placeholder="Message" name="message">
     <button type="submit">Submit</button>
 </form>
+<ol>
+    {{#messages}}
+    <li>{{text}}</li>
+    {{/messages}}
+</ol>
+
 </body>
 </html>

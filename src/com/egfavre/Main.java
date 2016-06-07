@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class Main {
     static User user;
     static ArrayList<Message> messages = new ArrayList<>();
+    static final String PASSWORD = "password";
 
     public static void main(String[] args) {
         Spark.init();
@@ -24,9 +25,9 @@ public class Main {
                         return new ModelAndView(m, "index.html");
                     }
                     else {
+                        m.put("messages", messages);
                         return new ModelAndView(m, "messages.html");
                     }
-
                 },
         new MustacheTemplateEngine()
         );
@@ -35,8 +36,15 @@ public class Main {
                 "/create-user",
                 (request, response) ->{
                     String name = request.queryParams("name");
-                    user = new User(name,"name");
-                    response.redirect("/");
+                    String password = request.queryParams("pass");
+                    if (password.equals(PASSWORD)){
+                        user = new User(name,password);
+                        response.redirect("/");
+                    }
+                    else{
+                        throw new Exception("Wrong Password");
+                    }
+
                     return "";
                 }
         );
